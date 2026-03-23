@@ -8,9 +8,8 @@ internal class Program
     {
         for (int i = 0; i <= 20; i++)
         {
-            Console.Write($"{i}\t");
             Thread.Sleep(500);
-            Console.WriteLine($"Thread # {Thread.CurrentThread.ManagedThreadId}");
+            Console.WriteLine($"Thread # {Thread.CurrentThread.ManagedThreadId} \t{i}");
 
         }
     }
@@ -25,21 +24,23 @@ internal class Program
     }
     static void Main(string[] args)
     {
-        new ProcessDemo().Run();
+        new WorkerDllPoint().Run();
+
+        //new ProcessDemo().Run();
         //new WorkerDllCPlusPlus().Run();
         //Console.WriteLine("Start Main");
-
+        //Thread thread = new Thread(TestThread2);
+        //thread.Start();
         //for (int i = 0; i <= 20; i++)
         //{
-        //    Console.WriteLine(i);
         //    Thread.Sleep(1000);
-        //    Console.WriteLine($"Thread # {Thread.CurrentThread.ManagedThreadId}");
+        //    Console.WriteLine($"Thread # {Thread.CurrentThread.ManagedThreadId} \t{i}");
 
         //}
         //Console.WriteLine("Finish Main");
 
         //Console.WriteLine("Start Main");
-        //Console.WriteLine("Cores: {0}",Environment.ProcessorCount);
+        //Console.WriteLine("Cores: {0}", Environment.ProcessorCount);
         //Console.WriteLine($"Core Main {Thread.GetCurrentProcessorId()}");
         //Console.WriteLine($"Thread # {Thread.CurrentThread.ManagedThreadId}");
         //Thread thread = new Thread(TestThread);
