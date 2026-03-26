@@ -40,8 +40,8 @@ class Currency
 internal class Program
 {
     private static readonly string URL = "https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json";
-    //static ConcurrentQueue<Order> ordersQueue = new ConcurrentQueue<Order>();
-    //private static bool isWorking = true;
+    static ConcurrentQueue<Order> ordersQueue = new ConcurrentQueue<Order>();
+    private static bool isWorking = true;
     //private static object _locker = new();
     //private static int total = 0;
     //static void TestThread2()
@@ -76,24 +76,24 @@ internal class Program
     //        Thread.Sleep(1);
     //    }
     //}
-    //static void ProcessOrders()
-    //{
-    //    while (isWorking || !ordersQueue.IsEmpty)
-    //    {
-    //        if (ordersQueue.TryDequeue(out Order order))
-    //        {
-    //            Console.WriteLine(
-    //                $"Працівник {Thread.CurrentThread.ManagedThreadId} обробляє замовлення {order.Id}: {order.ProductName}"
-    //            );
+    static void ProcessOrders()
+    {
+        while (isWorking || !ordersQueue.IsEmpty)
+        {
+            if (ordersQueue.TryDequeue(out Order order))
+            {
+                Console.WriteLine(
+                    $"Працівник {Thread.CurrentThread.ManagedThreadId} обробляє замовлення {order.Id}: {order.ProductName}"
+                );
 
-    //            Thread.Sleep(500);
+                Thread.Sleep(500);
 
-    //            Console.WriteLine(
-    //                $"Order # {order.Id} for product {order.ProductName} has been completed"
-    //            );
-    //        }
-    //    }
-    //}
+                Console.WriteLine(
+                    $"Order # {order.Id} for product {order.ProductName} has been completed"
+                );
+            }
+        }
+    }
 
     //static void PrintLow()
     //{
@@ -121,122 +121,161 @@ internal class Program
     //}
 
 
-    static async Task<Pizza> DoPizza()
-    {
-        Console.WriteLine("Отримали замовлення");
-        Console.WriteLine("Починвємо готувати");
-        await Task.Delay(500);
-        Console.WriteLine("Готуємо тісто");
-        await Task.Delay(1000);
-        Console.WriteLine("Готуємо начинку");
-        await Task.Delay(1000);
-        Console.WriteLine("Випікаємо піцу");
-        await Task.Delay(1000);
-        Console.WriteLine("Все готово");
-        return new Pizza { Name = "Margarita", Price = 300 };
+    //static async Task<Pizza> DoPizza()
+    //{
+    //    Console.WriteLine("Отримали замовлення");
+    //    Console.WriteLine("Починвємо готувати");
+    //    await Task.Delay(500);
+    //    Console.WriteLine("Готуємо тісто");
+    //    await Task.Delay(1000);
+    //    Console.WriteLine("Готуємо начинку");
+    //    await Task.Delay(1000);
+    //    Console.WriteLine("Випікаємо піцу");
+    //    await Task.Delay(1000);
+    //    Console.WriteLine("Все готово");
+    //    return new Pizza { Name = "Margarita", Price = 300 };
 
-    }
+    //}
 
-    static async Task<List<Document>> UploadingDocuments()
-    {
-        List<Document> docs = new List<Document>();
-        Console.WriteLine("Початок завантаження документів");
+    //static async Task<List<Document>> UploadingDocuments()
+    //{
+    //    List<Document> docs = new List<Document>();
+    //    Console.WriteLine("Початок завантаження документів");
 
-        for (int i = 1; i <= 3; i++)
-        {
-            await Task.Delay(1000);
-            Console.WriteLine($"Завантажуємо документ {i}");
+    //    for (int i = 1; i <= 3; i++)
+    //    {
+    //        await Task.Delay(1000);
+    //        Console.WriteLine($"Завантажуємо документ {i}");
 
-            await Task.Delay(1000);
-            Console.WriteLine($"Заповнюємо дані документу {i}");
+    //        await Task.Delay(1000);
+    //        Console.WriteLine($"Заповнюємо дані документу {i}");
 
-            docs.Add(new Document { Name = $"Документ {i}" });
-        }
+    //        docs.Add(new Document { Name = $"Документ {i}" });
+    //    }
 
-        Console.WriteLine("Все готово");
-        return docs;
-    }
+    //    Console.WriteLine("Все готово");
+    //    return docs;
+    //}
 
-    static async Task<List<Currency>> GetCurrency(){
+    //static async Task<List<Currency>> GetCurrency(){
 
-        using (HttpClient client = new HttpClient())
-        {
-            try
-            {
-                var response = await client.GetStringAsync(URL);
-                var obj = JsonSerializer.Deserialize<List<Currency>>(response);
-                if(obj != null)
-                {
-                    return obj;
-                }
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            return null;
+    //    using (HttpClient client = new HttpClient())
+    //    {
+    //        try
+    //        {
+    //            var response = await client.GetStringAsync(URL);
+    //            var obj = JsonSerializer.Deserialize<List<Currency>>(response);
+    //            if(obj != null)
+    //            {
+    //                return obj;
+    //            }
+    //        }
+    //        catch(Exception ex)
+    //        {
+    //            Console.WriteLine(ex.Message);
+    //        }
+    //        return null;
 
-        }
-
-
-    }
+    //    }
 
 
-    static decimal ConvertToDolars(decimal grn, List<Currency> currencies)
-    {
-        var dollar = currencies.FirstOrDefault(d => d.txt == "Долар США");
-        return grn / dollar.rate;
-    }
+    //}
+
+
+    //static decimal ConvertToDolars(decimal grn, List<Currency> currencies)
+    //{
+    //    var dollar = currencies.FirstOrDefault(d => d.txt == "Долар США");
+    //    return grn / dollar.rate;
+    //}
     static async Task Main(string[] args)
     {
-        BankAcount bankAcount = new BankAcount();
-        Thread thread1 = new Thread(_ =>
+
+        //HW TASK 2==================================
+
+        Console.WriteLine("Початок роботи");
+
+        int taskCount = 10;
+        CountdownEvent countdown = new CountdownEvent(taskCount);
+
+
+        for (int i = 1; i <= taskCount; i++)
         {
-            bankAcount.AdditionAcount(100);
-        });
-        Thread thread2 = new Thread(_ =>
-        {
-            bankAcount.AdditionAcount(200);
-        });
-        Thread thread3 = new Thread(_ =>
-        {
-            bankAcount.AdditionAcount(150);
-        });
+
+            ThreadPool.QueueUserWorkItem(state =>
+            {
+                Thread.Sleep(1000);
+
+                Console.WriteLine($"Замовлення {state} оброблено на потоці {Thread.CurrentThread.ManagedThreadId}");
+                countdown.Signal();
+
+            }, i);
+
+        }
+        countdown.Wait();
+        Console.WriteLine("Всі замовлення оброблені");
+
+       
+        //============================================
+
+        ////HW TASK 1==================================
+
+        //BankAcount bankAcount = new BankAcount();
+        //Thread thread1 = new Thread(_ =>
+        //{
+        //    bankAcount.AdditionAcount(100);
+        //});
+        //Thread thread2 = new Thread(_ =>
+        //{
+        //    bankAcount.AdditionAcount(200);
+        //});
+        //Thread thread3 = new Thread(_ =>
+        //{
+        //    bankAcount.AdditionAcount(150);
+        //});
 
 
 
-        Thread thread4 = new Thread(_ =>
-        {
-            bankAcount.WithdrawMoney(400);
-        });
-        Thread thread5 = new Thread(_ =>
-        {
-            bankAcount.WithdrawMoney(400);
-        });
-        Thread thread6 = new Thread(_ =>
-        {
-            bankAcount.WithdrawMoney(400);
-        });
+        //Thread thread4 = new Thread(_ =>
+        //{
+        //    bankAcount.WithdrawMoney(400);
+        //});
+        //Thread thread5 = new Thread(_ =>
+        //{
+        //    bankAcount.WithdrawMoney(400);
+        //});
+        //Thread thread6 = new Thread(_ =>
+        //{
+        //    bankAcount.WithdrawMoney(400);
+        //});
 
-        bankAcount.ShowBalance();
-        thread1.Start();
-        thread2.Start();
-        thread3.Start();
+        //bankAcount.ShowBalance();
+        //thread1.Start();
+        //thread2.Start();
+        //thread3.Start();
 
-        thread1.Join();
-        thread2.Join();
-        thread3.Join();
-        bankAcount.ShowBalance();
+        //thread1.Join();
+        //thread2.Join();
+        //thread3.Join();
+        //bankAcount.ShowBalance();
 
-        thread4.Start();
-        thread5.Start();
-        thread6.Start();
+        //thread4.Start();
+        //thread5.Start();
+        //thread6.Start();
 
-        thread4.Join();
-        thread5.Join();
-        thread6.Join();
+        //thread4.Join();
+        //thread5.Join();
+        //thread6.Join();
 
-        bankAcount.ShowBalance();
+        //bankAcount.ShowBalance();
+
+
+
+        ////=================================================
+
+
+
+
+
 
         //Console.WriteLine("Введіть скільки грн: ");
         //decimal grn = Convert.ToDecimal(Console.ReadLine());
